@@ -134,6 +134,36 @@
                 <header class="mb-3 flex flex-wrap justify-between items-center bg-white p-3 rounded-lg shadow-sm gap-2">
                     <div>
                         <h1 class="text-base sm:text-xl font-bold text-gray-800">KASIR DIFFAZA <span class="text-[10px] sm:text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-sm font-normal">v10.8.0</span></h1>
+                        <script>
+// 1. Simpan referal otomatis begitu halaman kasir dibuka dari link affiliate
+window.addEventListener('DOMContentLoaded', (event) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get('ref');
+  
+  if (refCode) {
+    localStorage.setItem('affiliate_ref', refCode);
+  }
+});
+
+// 2. Fungsi otomatis saat tombol "Affiliate" diklik agar membawa referal ke affione
+function bukaAffiliate(e) {
+  e.preventDefault();
+
+  // Ambil kode referal yang tersimpan di browser
+  const savedRef = localStorage.getItem('affiliate_ref');
+  
+  // Base URL affione
+  let affiliateUrl = 'https://arief12196.github.io/affione/'; 
+
+  // Jika ada kode referal tersimpan, tempelkan otomatis di ujung URL
+  if (savedRef) {
+    affiliateUrl += '?ref=' + savedRef;
+  }
+
+  // Buka halaman affione dengan membawa referal secara otomatis
+  window.open(affiliateUrl, '_blank');
+}
+</script>
                         <p class="text-[11px] sm:text-xs font-bold text-red-700 flex items-center gap-1 flex-wrap">
                             Sekali 
                             <a href="https://sites.google.com/view/diffaza/halaman-muka" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-600 px-2 py-0.5 rounded-full text-[10px] sm:text-xs no-underline transition-colors" target="_blank">
