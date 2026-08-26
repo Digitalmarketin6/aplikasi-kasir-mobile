@@ -1765,61 +1765,7 @@ function backupProduk() {
     alert('Data berhasil diunduh! Silakan buka file tersebut dengan Notepad.');
 }
 
-    </script>
-<!-- OVERLAY PEMBAYARAN / TRIAL HABIS -->
-<div id="paywall-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center; font-family:sans-serif;">
-  <div style="background:#fff; padding:30px; border-radius:12px; max-width:450px; width:90%; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
-    <h2 style="color:#d9534f; margin-top:0;">Masa Trial Telah Berakhir</h2>
-    <p style="color:#555; line-height:1.5;">
-      Masa uji coba gratis (trial) aplikasi Anda selama 6 hari telah habis. Silakan lakukan pembayaran untuk membuka kembali akses penuh aplikasi.
-    </p>
-    <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:20px 0; font-size:14px; color:#333;">
-      <strong>Silakan transfer ke:</strong><br>
-      BCA: 1234567890 a.n. Arief Durachman<br>
-      Nominal: <strong>Rp 150.000</strong>
-    </div>
-    
-    <!-- Tombol diarahkan ke Landing Page Anda -->
-    <a href="https://sites.google.com/view/diffaza/halaman-muka/konfirmasi" target="_blank" style="display:block; background:#007bff; color:#fff; padding:12px 20px; text-decoration:none; border-radius:6px; font-weight:bold; margin-bottom:10px;">Lakukan Pembayaran & Konfirmasi</a>
-    
-    <p style="font-size:12px; color:#999; margin-bottom:0;">Butuh bantuan? Hubungi admin.</p>
-  </div>
-</div>
-
-<script>
-  window.addEventListener('DOMContentLoaded', function() {
-    // Durasi Trial 6 Hari (dalam milidetik)
-    const TRIAL_DAYS = 6;
-    const TRIAL_DURATION = TRIAL_DAYS * 24 * 60 * 60 * 1000;
-    
-    const subscriptionStatus = localStorage.getItem('app_sub_status');
-    
-    // Jika belum berstatus aktif (belum bayar)
-    if (subscriptionStatus !== 'active') {
-      let installDate = localStorage.getItem('app_install_date');
-      const now = new Date().getTime();
-      
-      // Jika perangkat ini baru pertama kali membuka aplikasi, catat waktunya sekarang
-      if (!installDate || isNaN(installDate)) {
-        installDate = now;
-        localStorage.setItem('app_install_date', installDate);
-      }
-      
-      const elapsedTime = now - parseInt(installDate);
-      const remainingTime = TRIAL_DURATION - elapsedTime;
-      const remainingDays = Math.ceil(remainingTime / (1000 * 60 * 60 * 24));
-      
-      // 1. Jika waktu di perangkat ini sudah melewati 6 hari -> Kunci aplikasi dengan overlay
-      if (elapsedTime >= TRIAL_DURATION) {
-        document.getElementById('paywall-overlay').style.display = 'flex';
-      } 
-      // 2. Jika sisa 2 hari atau 1 hari (hari ke-5) -> Munculkan peringatan
-      else if (remainingDays === 2 || remainingDays === 1) {
-        alert(`⚠️ Peringatan: Masa uji coba (trial) aplikasi Anda akan berakhir dalam ${remainingDays} hari lagi. Segera lakukan pembayaran agar akses tidak terkunci.`);
-      }
-    }
-  });
-</script>
+   
 <script>
     // 1. Mencegah klik kanan
     document.addEventListener('contextmenu', function(e) {
