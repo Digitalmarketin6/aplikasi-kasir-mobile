@@ -1154,16 +1154,25 @@ setTimeout(async () => {
             let waNumber = '';
             
             if (rawPhone) {
-                // Hapus semua karakter selain angka
                 waNumber = rawPhone.replace(/\D/g, '');
-                // Jika diawali angka '0', ubah ke kode negara '62'
                 if (waNumber.startsWith('0')) {
                     waNumber = '62' + waNumber.slice(1);
                 }
             }
 
-            // Tentukan link tujuan WhatsApp (jika nomor diisi, langsung ke nomor tersebut, jika kosong ke wa.me umum)
+            // Tentukan link tujuan WhatsApp
             const waLink = waNumber ? `https://wa.me/${waNumber}` : "https://wa.me/";
+
+            // Fungsi pembantu untuk membuka WhatsApp secara aman di HP tanpa diblokir browser
+            const openWhatsAppSafely = () => {
+                // Menggunakan elemen link tiruan agar dibaca browser sebagai interaksi murni
+                const waAnchor = document.createElement('a');
+                waAnchor.href = waLink;
+                waAnchor.target = '_blank';
+                document.body.appendChild(waAnchor);
+                waAnchor.click();
+                document.body.removeChild(waAnchor);
+            };
 
             try {
                 // Coba salin ke clipboard dulu
@@ -1171,7 +1180,7 @@ setTimeout(async () => {
                 await navigator.clipboard.write([item]);
                 
                 alert('Struk berhasil disalin! Silakan paste di WhatsApp.');
-                window.location.href = waLink; 
+                openWhatsAppSafely();
 
             } catch (clipErr) {
                 // JIKA GAGAL KARENA IZIN BROWSER HP, ALIHKAN KE FITUR DOWNLOAD OTOMATIS
@@ -1187,7 +1196,7 @@ setTimeout(async () => {
                 URL.revokeObjectURL(url);
 
                 alert('Browser HP membatasi salin otomatis. Struk telah diunduh sebagai gambar! Silakan kirim gambar tersebut via WhatsApp.');
-                window.location.href = waLink;
+                openWhatsAppSafely();
             }
         });
 
