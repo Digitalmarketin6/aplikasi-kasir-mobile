@@ -1149,29 +1149,28 @@ setTimeout(async () => {
                 return;
             }
             
-            // Ambil nomor WhatsApp dari input dan bersihkan (hanya ambil angka)
+            // Ambil nomor dari input customer-phone dan bersihkan formatnya
             let rawPhone = document.getElementById('customer-phone').value.trim();
             let waNumber = '';
             
             if (rawPhone) {
-                // Hapus semua karakter selain angka
-                waNumber = rawPhone.replace(/\D/g, '');
-                // Jika diawali angka '0', ubah ke kode negara '62'
+                waNumber = rawPhone.replace(/\D/g, ''); // Hanya ambil angka
                 if (waNumber.startsWith('0')) {
-                    waNumber = '62' + waNumber.slice(1);
+                    waNumber = '62' + waNumber.slice(1); // Ubah 0 di depan jadi 62
                 }
             }
 
-            // Tentukan link tujuan WhatsApp (jika nomor diisi, langsung ke nomor tersebut, jika kosong ke wa.me umum)
+            // Tentukan link tujuan WhatsApp (jika nomor diisi, arahkan ke nomor tersebut)
             const waLink = waNumber ? `https://wa.me/${waNumber}` : "https://wa.me/";
-
+            
             try {
                 // Coba salin ke clipboard dulu
                 const item = new ClipboardItem({ "image/png": blob });
                 await navigator.clipboard.write([item]);
                 
+                // Munculkan alert dengan tombol OK, setelah diklik langsung buka WhatsApp
                 alert('Struk berhasil disalin! Silakan paste di WhatsApp.');
-                window.location.href = waLink; 
+                window.location.href = waLink;
 
             } catch (clipErr) {
                 // JIKA GAGAL KARENA IZIN BROWSER HP, ALIHKAN KE FITUR DOWNLOAD OTOMATIS
@@ -1186,6 +1185,7 @@ setTimeout(async () => {
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
 
+                // Munculkan alert unduhan dengan tombol OK, setelah diklik langsung buka WhatsApp
                 alert('Browser HP membatasi salin otomatis. Struk telah diunduh sebagai gambar! Silakan kirim gambar tersebut via WhatsApp.');
                 window.location.href = waLink;
             }
@@ -1200,8 +1200,7 @@ setTimeout(async () => {
         receiptBox.style.left = '-9999px';
         receiptBox.style.top = '-9999px';
     }
-}, 100);
-
+}, 100); // Waktu jeda dipangkas agar tetap dianggap sebagai interaksi pengguna
 
         // MODAL LAPORAN VIEW CONTROL
         function toggleLaporanModal(show) {
