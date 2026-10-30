@@ -1,15 +1,32 @@
-
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kasir Pintar - POS Pro Visual v10.8.0 (With Void & WhatsApp Admin)</title>
+    <title>Sistem Kasir Pintar - POS Pro Visual v10.8.0 (With Void)</title>
+
+
+
+
+
 
 <script>
+
+
+
+
+
+
+
+
+
+
+
 (function() {
+  // 1. Ganti URL ini dengan URL Cloud API / Server Anda
   const CLOUD_BASE_URL = "https://api.cloud-anda.com"; 
+
+  // Regex untuk mendeteksi localhost atau 127.0.0.1 (dengan port berapa saja)
   const LOCALHOST_PATTERN = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/;
 
   function replaceWithCloud(url) {
@@ -19,6 +36,7 @@
     return url;
   }
 
+  // --- A. Intercept/Cegat Window.fetch ---
   const originalFetch = window.fetch;
   window.fetch = function(resource, config) {
     if (typeof resource === 'string') {
@@ -30,6 +48,7 @@
     return originalFetch.call(this, resource, config);
   };
 
+  // --- B. Intercept/Cegat XMLHttpRequest (Axios / Ajax) ---
   const originalOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
     url = replaceWithCloud(url);
@@ -40,27 +59,37 @@
 })();
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-@media (max-width: 640px) {
-    #product-modal > div {
-        max-width: 95% !important;
-        margin: 10px;
-    }
-    body {
-        font-size: 13px;
-    }
-}
+        
 
+/* Sembunyikan print-area dari tampilan layar biasa */
 #print-area {
     position: absolute;
     left: -9999px;
     top: -9999px;
 }
 
+/* Hanya tampilkan saat proses printing berlangsung */
 @media print {
     #print-area {
         position: static;
@@ -68,49 +97,52 @@
         top: auto;
         width: 100%;
     }
+    /* Sembunyikan elemen lain yang tidak perlu tercetak */
     body > *:not(#print-area) {
         display: none;
     }
 }
 
 .product-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 270px;
-    box-sizing: border-box;
-    transition: all 0.2s ease;
-}
-.product-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-.product-img-container {
-    height: 130px;
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    background-color: #f3f4f6;
-}
-.product-img-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-@media print {
-    body * { visibility: hidden; }
-    #print-area, #print-area * { visibility: visible; }
-    #print-area { position: absolute; left: 0; top: 0; width: 58mm; font-family: 'Courier New', monospace; font-size: 11px; }
-    @page { margin: 0; size: auto; }
-}
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 270px;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+        .product-card:hover {
+
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .product-img-container {
+            height: 130px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            background-color: #f3f4f6;
+        }
+        .product-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 58mm; font-family: 'Courier New', monospace; font-size: 11px; }
+            @page { margin: 0; size: auto; }
+        }
+   
     </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased text-xs sm:text-sm m-0 p-0 pb-20 lg:pb-0">
+<body class="bg-gray-300 font-sans antialiased text-xs sm:text-sm m-0 p-0 pb-20 lg:pb-0">
 
     <div class="flex flex-col lg:flex-row min-h-screen overflow-y-auto lg:overflow-hidden">
         
         <!-- BAGIAN KIRI: DAFTAR PRODUK -->
-        <div class="w-full lg:w-7/12 p-3 sm:p-4 flex flex-col h-auto lg:h-full">
+       <div class="w-full lg:w-7/50 p-3 sm:p-4 flex flex-col max-h-[700px] overflow-y-auto">
             
             <!-- KELOMPOK BAGIAN ATAS YANG BISA DITUTUP/DIBUKA -->
             <div id="top-dashboard-section" class="transition-all duration-300">
@@ -133,46 +165,60 @@
                 <!-- Header Toko -->
                 <header class="mb-3 flex flex-wrap justify-between items-center bg-white p-3 rounded-lg shadow-sm gap-2">
                     <div>
-                        <h1 class="text-base sm:text-xl font-bold text-gray-800">KASIR DIFFAZA <span class="text-[10px] sm:text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-sm font-normal">v10.8.0</span></h1>
-                        <script>
-// 1. Simpan referal otomatis begitu halaman kasir dibuka dari link affiliate
-window.addEventListener('DOMContentLoaded', (event) => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const refCode = urlParams.get('ref');
-  
-  if (refCode) {
-    localStorage.setItem('affiliate_ref', refCode);
-  }
-});
+                       <h1 class="text-base sm:text-xl font-bold text-gray-800">
+    KASIR DIFFAZA 
+    <span class="text-[10px] sm:text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-sm font-normal">v10.8.0</span>
+    <a href="https://Digitalmarketin6.github.io/affione/" target="_blank" class="text-[11px] sm:text-xs text-blue-600 hover:underline ml-2 font-medium inline-flex items-center gap-1">
+        👉 Affiliate
+    </a>
+</h1>
+                        
+                       <!-- BAGIAN HEADER -->
+<p class="text-[11px] sm:text-xs font-bold text-red-700 flex items-center gap-1 flex-wrap">
+    Sekali 
+    <a id="header-pay-link" href="https://Digitalmarketin6.github.io/affione/" class="bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full text-[10px] sm:text-xs no-underline hover:bg-emerald-200 transition">
+        bayar!
+    </a>
+    nikmati premium tanpa batas!
+</p>
 
-// 2. Fungsi otomatis saat tombol "Affiliate" diklik agar membawa referal ke affione
-function bukaAffiliate(e) {
-  e.preventDefault();
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    // 1. Tangkap kode referral dari URL jika ada, lalu simpan ke localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref') || urlParams.get('aff');
+    if (refCode) {
+      localStorage.setItem('app_aff_ref', refCode);
+    }
 
-  // Ambil kode referal yang tersimpan di browser
-  const savedRef = localStorage.getItem('affiliate_ref');
-  
-  // Base URL affione
-  let affiliateUrl = 'https://arief12196.github.io/affione/'; 
+    // 2. Pasang link dinamis dengan kode referral ke teks "bayar!" di header
+    const savedRef = localStorage.getItem('app_aff_ref');
+    let targetUrl = "https://Digitalmarketin6.github.io/affione/";
+    
+    if (savedRef) {
+      targetUrl += `?ref=${encodeURIComponent(savedRef)}`;
+    }
 
-  // Jika ada kode referal tersimpan, tempelkan otomatis di ujung URL
-  if (savedRef) {
-    affiliateUrl += '?ref=' + savedRef;
-  }
-
-  // Buka halaman affione dengan membawa referal secara otomatis
-  window.open(affiliateUrl, '_blank');
-}
+    const headerPayLink = document.getElementById('header-pay-link');
+    if (headerPayLink) {
+      headerPayLink.href = targetUrl;
+    }
+  });
 </script>
-                        <p class="text-[11px] sm:text-xs font-bold text-red-700 flex items-center gap-1 flex-wrap">
-                            Sekali 
-                            <a href="https://sites.google.com/view/diffaza/halaman-muka" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-600 px-2 py-0.5 rounded-full text-[10px] sm:text-xs no-underline transition-colors" target="_blank">
-                                bayar!
-                            </a>
-                            nikmati premium tanpa batas!
-                        </p>
                     </div>
 
+
+
+
+<!-- Tambahkan tombol ini di dalam <div class="flex flex-wrap gap-1 sm:gap-1.5 items-center"> pada header Anda -->
+<button onclick="bukaRangkumanStok()" class="bg-purple-600 hover:bg-purple-700 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold flex items-center gap-1 cursor-pointer shadow-sm">
+    <i class="fa-solid fa-boxes-stacked"></i>
+</button>
+
+
+
+
+                    
                     <div class="flex flex-wrap gap-1 sm:gap-1.5 items-center">
                         <button onclick="backupProduk()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold flex items-center gap-1 cursor-pointer">
                             <i class="fa-solid fa-file-export"></i> Backup
@@ -210,8 +256,8 @@ function bukaAffiliate(e) {
 
                 <div class="flex gap-2 overflow-x-auto pb-1" id="category-tabs">
                     <button onclick="switchCategory('Semua')" id="tab-Semua" class="category-btn bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium shadow-sm cursor-pointer whitespace-nowrap">Semua</button>
-                    <button onclick="switchCategory('Alat Tulis')" id="tab-Alat Tulis" class="category-btn bg-white text-gray-600 border border-gray-200 px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">Alat Tulis</button>
-                    <button onclick="switchCategory('Buku')" id="tab-Buku" class="category-btn bg-white text-gray-600 border border-gray-200 px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">Buku</button>
+                    <button onclick="switchCategory('Dus')" id="tab-Dus" class="category-btn bg-white text-gray-600 border border-gray-200 px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">Dus</button>
+                    <button onclick="switchCategory('Pcs')" id="tab-Pcs" class="category-btn bg-white text-gray-600 border border-gray-200 px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">Pcs</button>
                     <button onclick="switchCategory('Grosir')" id="tab-Grosir" class="category-btn bg-white text-gray-600 border border-gray-200 px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">Grosir</button>
                     <button onclick="switchCategory('Lain-lain')" id="tab-Lain-lain" class="category-btn bg-white text-gray-600 border border-gray-200 px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">Lain-lain</button>
                 </div>
@@ -221,16 +267,18 @@ function bukaAffiliate(e) {
             <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 overflow-y-auto pr-1 flex-1 content-start pb-6"></div>
         </div>
 
-        <!-- BAGIAN KANAN: KERANJANG & PEMBAYARAN -->
-        <div id="section-keranjang" class="w-full lg:w-5/12 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 p-3 sm:p-4 flex flex-col h-auto lg:h-full shadow-xl overflow-y-auto">
-            <div class="flex items-center gap-2 pb-2 border-b border-gray-100">
+       <!-- BAGIAN KANAN: KERANJANG & PEMBAYARAN -->
+       <div id="section-keranjang" class="w-full lg:w-5/12 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 p-3 sm:p-4 flex flex-col h-auto lg:h-full shadow-xl">
+            <div class="flex items-center gap-2 pb-2 border-b border-gray-100 shrink-0">
                 <i class="fa-solid fa-cart-shopping text-blue-600 text-base sm:text-lg"></i>
                 <h2 class="text-base sm:text-lg font-bold text-gray-800">Keranjang Belanja</h2>
             </div>
 
-            <div id="cart-items" class="flex-1 min-h-[140px] overflow-y-auto py-2 space-y-2"></div>
+            <!-- HAPUS overflow-y-auto di utama, pindah dan batasi max-height disini agar hanya item keranjang yang bisa di-scroll -->
+            <div id="cart-items" class="flex-1 min-h-[140px] max-h-[180px] overflow-y-auto py-2 space-y-2 pr-1"></div>
 
-            <div class="border-t border-gray-100 pt-2 space-y-2">
+            <!-- Bagian bawah (Subtotal, Total Tagihan, & Kalkulator) akan diam/terkunci di bawah -->
+            <div class="border-t border-gray-100 pt-2 space-y-2 shrink-0">
                 <div class="flex justify-between text-gray-600 text-xs"><span>Subtotal</span><span id="subtotal-val">Rp 0</span></div>
                 <div class="flex justify-between text-base sm:text-lg font-bold text-gray-800 pt-1 border-t border-dashed border-gray-200"><span>Total Tagihan</span><span id="total-val" class="text-blue-600">Rp 0</span></div>
                 
@@ -253,16 +301,17 @@ function bukaAffiliate(e) {
                             observer.observe(totalValEl, { childList: true, characterData: true, subtree: true });
                         }
                     });
-                </script>
+</script>
 
-                <div class="pt-0.5">
+</div>
+  <div class="pt-0.5">
                     <label class="block text-[11px] text-gray-500 mb-0.5">No. WhatsApp Pelanggan (Opsional)</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-400 text-xs"><i class="fa-brands fa-whatsapp"></i></span>
-                        <input type="text" id="customer-phone" placeholder="Kosongkan!" class="w-full pl-7 pr-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500">
+                        <input type="text" id="customer-phone" placeholder="62 (Nomor pelanggan!)" class="w-full pl-7 pr-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500">
                     </div>
                 </div>
-
+           
                 <!-- Tombol Pembayaran -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1">
                     <button id="btn-bayar-lokal" class="bg-gray-800 hover:bg-gray-950 text-white py-2 rounded-lg font-medium text-[11px] cursor-pointer"><i class="fa-solid fa-save mr-1"></i> Simpan Saja</button>
@@ -322,10 +371,21 @@ function bukaAffiliate(e) {
                 <span id="float-total" class="text-sm font-bold text-emerald-400">Rp 0</span>
             </div>
         </div>
-        <button onclick="scrollToKeranjang()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md flex items-center gap-1.5 cursor-pointer">
-            <span>Bayar Sekarang</span>
-            <i class="fa-solid fa-arrow-down"></i>
-        </button>
+
+
+<button onclick="
+    if (window.scrollY > 100) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md flex items-center gap-1.5 cursor-pointer">
+    <i class="fa-solid fa-arrow-up"></i>
+    <span></span>
+    <i class="fa-solid fa-arrow-down"></i>
+</button>
+
+        
     </div>
 
     <script>
@@ -361,7 +421,6 @@ function bukaAffiliate(e) {
 
 
 </script>
-
     <!-- MODAL LAPORAN -->
     <div id="laporan-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -486,7 +545,7 @@ function bukaAffiliate(e) {
         </div>
     </div>
 
-   <!-- MODAL PRODUK -->
+     <!-- MODAL PRODUK -->
     <div id="product-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
             <div class="flex justify-between items-center px-5 py-4 bg-gray-50 border-b border-gray-200">
@@ -497,14 +556,14 @@ function bukaAffiliate(e) {
                 <input type="hidden" id="p-id">
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-700 mb-1">Nama Produk</label>
-                    <input type="text" id="p-name" required placeholder="Contoh: Buku Tulis Sidu 38 Lembar" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white text-gray-800">
+                    <input type="text" id="p-name" required placeholder="Contoh: Gambar default ini bisa di ubah" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white text-gray-800">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-700 mb-1">Kategori</label>
                         <select id="p-category" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none bg-white text-gray-800">
-                            <option value="Alat Tulis">Alat Tulis</option>
-                            <option value="Buku">Buku</option>
+                            <option value="Dus">Dus</option>
+                            <option value="Pcs">Pcs</option>
                             <option value="Grosir">Grosir</option>
                             <option value="Lain-lain">Lain-lain</option>
                         </select>
@@ -536,13 +595,14 @@ function bukaAffiliate(e) {
    
         </div>
     </div>
+        
 
     <!-- STRUK DIGITAL UNTUK CANVAS -->
     <div style="position: absolute; left: -9999px; top: -9999px;">
         <div id="digital-receipt-box" style="width: 360px; background: #ffffff; padding: 20px; font-family: 'Courier New', Courier, monospace; color: #000000;">
-            <div style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 2px;">DIFAZZA ALAT TULIS</div>
+            <div style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 2px;">Aplikasi Kasir Diffaza</div>
             <div style="text-align: center; font-size: 11px; color: #555; margin-bottom: 10px;">Struk Pembayaran Digital</div>
-            <div style="text-align: center; font-size: 11px; color: #555; margin-bottom: 10px;">JL. Pramuka|cangkoak|dukupuntang</div>
+            <div style="text-align: center; font-size: 11px; color: #555; margin-bottom: 10px;">CSapp.083185706741</div>
             <div style="font-size: 11px; margin-bottom: 5px;" id="rec-date">Tgl: -</div>
             <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
 
@@ -592,7 +652,7 @@ function bukaAffiliate(e) {
         
       // DATA MASTER & DATABASE LOCALSTORAGE
         let products = JSON.parse(localStorage.getItem('kasir_products_v10')) || [
-            { id: 1, name: "Buku Tulis Sidu 38 Lembar", category: "Alat Tulis", hpp: 3000, price: 4500, stock: 15, total_sales: 0, image: "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=300" }
+            { id: 1, name: "Gambar Default ini bisa diubah", category: "Dus", hpp: 3000, price: 4500, stock: 15, total_sales: 0, image: "https://plus.unsplash.com/premium_photo-1689245691396-9cf66f1594f4?q=80&w=430" }
         ];
 
         let laporanMaster = JSON.parse(localStorage.getItem('kasir_laporan_master_v10')) || {
@@ -1093,7 +1153,7 @@ laporanMaster.kasLog.unshift({
         function doThermalPrintPrintout(uangBayar) {
             const printArea = document.getElementById('print-area');
             printArea.innerHTML = `
-                <div style="text-align:center; font-weight:bold;">KASIR PINTAR THERMAL</div>
+                <div style="text-align:center; font-weight:bold;">TOKO DIFFAZA ALAT TULIS KANTOR</div>
                 <div style="text-align:center;">Tgl: ${new Date().toLocaleString('id-ID')}</div>
                 <hr style="border-top:1px dashed #000; margin:5px 0;">
                 <div style="line-height:1.4;">
@@ -1156,11 +1216,7 @@ ${cart.map(i => `
     document.getElementById('rec-pay-val').innerText = formatRupiah(uangBayar);
     document.getElementById('rec-change-val').innerText = formatRupiah(uangBayar - total);
 
-   
-        
-
-
-// 2. Proses render dan simpan/salin gambar
+   // 2. Proses render dan simpan/salin gambar
 setTimeout(async () => {
     const receiptBox = document.getElementById('digital-receipt-box');
     
@@ -1241,7 +1297,6 @@ setTimeout(async () => {
     }
 }, 100);
         }
-
         // MODAL LAPORAN VIEW CONTROL
         function toggleLaporanModal(show) {
             const modal = document.getElementById('laporan-modal');
@@ -1796,6 +1851,12 @@ function backupProduk() {
 }
 
     </script>
+
+
+
+
+
+    
 <script>
     // 1. Mencegah klik kanan
     document.addEventListener('contextmenu', function(e) {
@@ -1822,10 +1883,484 @@ function backupProduk() {
             return false;
         }
     });
+</script>
+    <!-- LETAKKAN SCRIPT INI TEPAT SEBELUM </body> -->
+    <!-- ========================================== -->
+    <script>
+      // Menangkap parameter 'ref' dari URL saat halaman dimuat
+      const urlParams = new URLSearchParams(window.location.search);
+      const refCode = urlParams.get('ref');
 
+      // Jika ada kode referal di URL, simpan ke localStorage browser
+      if (refCode) {
+        localStorage.setItem('affiliate_ref', refCode);
+      }
+
+      // Fungsi untuk tombol Bayar yang membawa referal tersimpan ke affione
+      function prosesBayarReferal(e) {
+        e.preventDefault(); 
+        const savedRef = localStorage.getItem('affiliate_ref');
+        let checkoutUrl = 'https://Digitalmarketin6.github.io/affione/'; 
+
+        if (savedRef) {
+          checkoutUrl += '?ref=' + savedRef;
+        }
+        window.location.href = checkoutUrl;
+      }
+    </script>
+    <!-- OVERLAY PEMBAYARAN / TRIAL HABIS -->
+<div id="paywall-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center; font-family:sans-serif;">
+  <div style="background:#fff; padding:30px; border-radius:12px; max-width:450px; width:90%; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.3); position:relative;">
+    
+    <!-- TOMBOL X (Tutup Sementara) -->
+    <button onclick="document.getElementById('paywall-overlay').style.display='none';" style="position:absolute; top:15px; right:15px; background:transparent; border:none; font-size:20px; color:#999; cursor:pointer; font-weight:bold;" title="Tutup sementara">&times;</button>
+
+    <h2 style="color:#d9534f; margin-top:0;">Masa Trial Telah Berakhir</h2>
+    <p style="color:#555; line-height:1.5;">
+      Masa uji coba gratis (trial) aplikasi Anda selama 6 hari telah habis. Silakan lakukan pembayaran untuk membuka kembali akses penuh aplikasi.
+    </p>
+    <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:20px 0; font-size:14px; color:#333;">
+      <strong>Silakan transfer Qris:</strong><br>
+       a.n. MDproduct.id<br>
+      Nominal: <strong>Rp 100.000</strong>
+    </div>
+    
+    <!-- Tombol diarahkan langsung ke Landing Page Affione dengan link referal dinamis -->
+    <a id="btn-pay" href="https://Digitalmarketin6.github.io/affione/" style="display:block; background:#007bff; color:#fff; padding:12px 20px; text-decoration:none; border-radius:6px; font-weight:bold; margin-bottom:10px;">Lakukan Pembayaran & Konfirmasi</a>
+    
+    <p style="font-size:12px; color:#999; margin-bottom:0;">Butuh bantuan? Hubungi admin.</p>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    // 1. Tangkap kode referral dari URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref') || urlParams.get('aff');
+
+    if (refCode) {
+      localStorage.setItem('app_aff_ref', refCode);
+    }
+
+    // 2. Set link pembayaran secara dinamis
+    const savedRef = localStorage.getItem('app_aff_ref');
+    const payButton = document.getElementById('btn-pay');
+    let targetUrl = "https://Digitalmarketin6.github.io/affione/";
+    
+    if (savedRef) {
+      targetUrl += `?ref=${encodeURIComponent(savedRef)}`;
+    }
+    payButton.href = targetUrl;
+
+    // 3. Logika Durasi Trial 6 Hari
+    const TRIAL_DAYS = 6;
+    const TRIAL_DURATION = TRIAL_DAYS * 24 * 60 * 60 * 1000;
+    
+    const subscriptionStatus = localStorage.getItem('app_sub_status');
+    
+    if (subscriptionStatus !== 'active') {
+      let installDate = localStorage.getItem('app_install_date');
+      const now = new Date().getTime();
+      
+      if (!installDate || isNaN(installDate)) {
+        installDate = now;
+        localStorage.setItem('app_install_date', installDate);
+      }
+      
+      const elapsedTime = now - parseInt(installDate);
+      const remainingTime = TRIAL_DURATION - elapsedTime;
+      const remainingDays = Math.ceil(remainingTime / (1000 * 60 * 60 * 24));
+      
+      if (elapsedTime >= TRIAL_DURATION) {
+        // Jika masa trial habis, tampilkan overlay
+        document.getElementById('paywall-overlay').style.display = 'flex';
+      } 
+      else if (remainingDays === 2 || remainingDays === 1) {
+        alert(`⚠️ Peringatan: Masa uji coba (trial) aplikasi Anda akan berakhir dalam ${remainingDays} hari lagi. Segera lakukan pembayaran agar akses tidak terkunci.`);
+      }
+    }
+  });
+</script>
+
+
+
+
+    
+<script>
+// Fungsi untuk menghapus keseluruhan grid dan database produk secara total
+function konfirmasiHapusSemuaProduk() {
+    // Konfirmasi keamanan lapis pertama
+    let konfirmasi1 = confirm("PERINGATAN KERAS: Apakah Anda yakin ingin MENGHAPUS SELURUH data produk dan katalog? Tindakan ini tidak dapat dibatalkan!");
+    if (!konfirmasi1) return;
+
+    // Konfirmasi lapis kedua untuk mencegah salah klik
+    let konfirmasi2 = confirm("Yakin sekali? Semua daftar barang, stok, dan harga akan hilang total dari sistem.");
+    if (!konfirmasi2) return;
+
+    // 1. Kosongkan semua variabel array utama di memori aplikasi kasir
+    if (typeof products !== 'undefined') {
+        products = [];
+    }
+    if (typeof daftarProduk !== 'undefined') {
+        daftarProduk = [];
+    }
+    globalProductsCache = [];
+
+    // 2. Hapus seluruh data dari penyimpanan lokal browser (localStorage) termasuk kunci katalog v10
+    localStorage.removeItem('products');
+    localStorage.removeItem('daftarProduk');
+    localStorage.removeItem('kasir_products_v10'); // <-- Kunci katalog utama Anda dibersihkan di sini
+    
+    // Pastikan tersimpan sebagai array kosong agar bersih dari sisa cache
+    localStorage.setItem('products', JSON.stringify([]));
+    localStorage.setItem('daftarProduk', JSON.stringify([]));
+    localStorage.setItem('kasir_products_v10', JSON.stringify([]));
+
+    // 3. Panggil fungsi render grid utama aplikasi kasir agar tampilannya langsung kosong
+    if (typeof renderProducts === 'function') {
+        renderProducts();
+    } else if (typeof tampilkanProduk === 'function') {
+        tampilkanProduk();
+    }
+
+    // 4. Tutup modal rangkuman jika sedang terbuka
+    if (typeof tutupRangkumanStok === 'function') {
+        tutupRangkumanStok();
+    }
+
+    alert("Semua data produk dan katalog berhasil dihapus bersih total.");
+    
+    // 5. Muat ulang halaman otomatis untuk memastikan grid benar-benar bersih dari cache
+    location.reload();
+}
+
+
+    
+// Variabel penyimpan referensi data mentah untuk filter pencarian modal
+let globalProductsCache = [];
+
+
+// Fungsi untuk membuka modal dan merangkum stok (Diperbarui agar sinkron data terbaru)
+function bukaRangkumanStok() {
+    const modal = document.getElementById('modal-rangkuman-stok');
+    modal.classList.remove('hidden');
+
+    // Paksa ambil ulang dari sumber data utama atau localStorage terbaru
+    if (typeof products !== 'undefined' && products.length > 0) {
+        globalProductsCache = products;
+    } else if (typeof daftarProduk !== 'undefined' && daftarProduk.length > 0) {
+        globalProductsCache = daftarProduk;
+    } else {
+        try {
+            globalProductsCache = JSON.parse(localStorage.getItem('products') || localStorage.getItem('daftarProduk') || '[]');
+        } catch (e) {
+            globalProductsCache = [];
+        }
+    }
+
+    renderIsiRangkuman(globalProductsCache);
+}
+
+
+
+
+    
+// Fungsi untuk menutup modal
+function tutupRangkumanStok() {
+    const modal = document.getElementById('modal-rangkuman-stok');
+    modal.classList.add('hidden');
+}
+
+// Render data ke dalam tabel modal dan hitung statistik ringkasnya
+function renderIsiRangkuman(dataArray) {
+    const tbody = document.getElementById('table-summary-body');
+    const elTotalJenis = document.getElementById('summary-total-jenis');
+    const elTotalQty = document.getElementById('summary-total-qty');
+    const elTotalMenipis = document.getElementById('summary-total-minipis');
+
+    tbody.innerHTML = '';
+
+    if (!dataArray || dataArray.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">Belum ada data stok produk tersedia.</td></tr>`;
+        elTotalJenis.innerText = '0';
+        elTotalQty.innerText = '0';
+        elTotalMenipis.innerText = '0';
+        return;
+    }
+
+    let totalQty = 0;
+    let totalMenipis = 0;
+
+    dataArray.forEach((item, index) => {
+        let nama = item.name || item.nama || item.nama_barang || 'Tanpa Nama';
+        let kategori = item.category || item.kategori || 'Umum';
+        let harga = item.price || item.harga || item.harga_jual || 0;
+        let stok = item.stock !== undefined ? item.stock : (item.stok !== undefined ? item.stok : 0);
+
+        totalQty += Number(stok);
+        if (Number(stok) <= 3) {
+            totalMenipis += 1;
         }
 
+        let rowClass = Number(stok) <= 3 ? 'bg-red-50 text-red-900 font-semibold' : 'hover:bg-gray-50';
+
+        let tr = document.createElement('tr');
+        tr.className = `border-b border-gray-100 ${rowClass}`;
+        tr.innerHTML = `
+            <td class="p-2 text-gray-500">${index + 1}</td>
+            <td class="p-2 font-medium text-slate-800">${nama}</td>
+            <td class="p-2"><span class="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-[10px]">${kategori}</span></td>
+            <td class="p-2 text-right font-mono">Rp ${Number(harga).toLocaleString('id-ID')}</td>
+            <td class="p-2 text-center font-bold ${Number(stok) <= 3 ? 'text-red-600' : 'text-emerald-600'}">${stok}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    elTotalJenis.innerText = dataArray.length;
+    elTotalQty.innerText = totalQty.toLocaleString('id-ID');
+    elTotalMenipis.innerText = totalMenipis;
+}
+
+// Fitur pencarian instan khusus di dalam modal rangkuman
+function filterRangkumanStok() {
+    const keyword = document.getElementById('search-summary').value.toLowerCase();
+    const filtered = globalProductsCache.filter(item => {
+        let nama = (item.name || item.nama || item.nama_barang || '').toLowerCase();
+        let kategori = (item.category || item.kategori || '').toLowerCase();
+        return nama.includes(keyword) || kategori.includes(keyword);
+    });
+    renderIsiRangkuman(filtered);
+}
+
+// Fungsi untuk Export/Cetak data ke file Excel (.xls)
+function cetakRangkumanStok() {
+    if (!globalProductsCache || globalProductsCache.length === 0) {
+        alert("Tidak ada data stok yang bisa diexport ke Excel!");
+        return;
+    }
+
+    let htmlContent = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+            <meta charset="utf-8">
+            <title>Laporan Rangkuman Stok</title>
+            <style>
+                table { border-collapse: collapse; width: 100%; }
+                th, td { border: 0.5pt solid #cccccc; padding: 6px; font-family: Arial, sans-serif; font-size: 11pt; }
+                th { background-color: #f2f2f2; font-weight: bold; text-align: center; }
+                .title { font-size: 14pt; font-weight: bold; text-align: center; margin-bottom: 10px; }
+            </style>
+        </head>
+        <body>
+            <table>
+                <tr>
+                    <th colspan="5" style="font-size: 14pt; background-color: #ffffff; border: none; text-align: center;">LAPORAN RANGKUMAN STOK - TOKO</th>
+                </tr>
+                <tr><td colspan="5" style="border: none;"></td></tr>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th>Harga Jual</th>
+                        <th>Stok</th>
+                        <th>SO</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    globalProductsCache.forEach((item, index) => {
+    let nama = item.name || item.nama || item.nama_barang || 'Tanpa Nama';
+    let kategori = item.category || item.kategori || 'Umum';
+    let harga = Number(item.price || item.harga || item.harga_jual || 0);
+    let stok = item.stock !== undefined ? item.stock : (item.stok !== undefined ? item.stok : 0);
+
+    htmlContent += `
+        <tr>
+            <td align="center">${index + 1}</td>
+            <td>${nama}</td>
+            <td>${kategori}</td>
+            <td align="right">${harga}</td>
+            <td align="center">${stok}</td>
+            <td align="center"></td> <!-- Kolom SO -->
+        </tr>
+    `;
+});
+
+    htmlContent += `
+                </tbody>
+            </table>
+        </body>
+        </html>
+    `;
+
+    // Buat file Blob dan picu download otomatis sebagai format Excel (.xls)
+    const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    
+    // Format nama file berdasarkan tanggal hari ini
+    const tanggalStr = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `Laporan_Stok_${tanggalStr}.xls`;
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+
+
 </script>
-</body>
+</script>
+<!-- MODAL RANGKUMAN STOK -->
+<div id="modal-rangkuman-stok" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+        <!-- Header Modal -->
+        <div class="bg-slate-900 text-white px-4 py-3 flex justify-between items-center">
+            <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
+                <i class="fa-solid fa-warehouse text-emerald-400"></i> Rangkuman Seluruh Data Stok
+            </h3>
+            <button onclick="tutupRangkumanStok()" class="text-gray-400 hover:text-white text-sm font-bold px-2 py-1 cursor-pointer">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Info Ringkas / Statistik Cepat -->
+        <div class="grid grid-cols-3 gap-2 p-3 bg-slate-50 border-b border-gray-200 text-center">
+            <div class="bg-white p-2 rounded border border-gray-200 shadow-xs">
+                <span class="text-[10px] text-gray-500 block">Total Jenis Produk</span>
+                <span id="summary-total-jenis" class="text-xs sm:text-sm font-bold text-slate-800">0</span>
+            </div>
+            <div class="bg-white p-2 rounded border border-gray-200 shadow-xs">
+                <span class="text-[10px] text-gray-500 block">Total Kuantitas Stok</span>
+                <span id="summary-total-qty" class="text-xs sm:text-sm font-bold text-blue-600">0</span>
+            </div>
+            <div class="bg-white p-2 rounded border border-gray-200 shadow-xs">
+                <span class="text-[10px] text-gray-500 block">Stok Menipis (&le; 3)</span>
+                <span id="summary-total-minipis" class="text-xs sm:text-sm font-bold text-red-600">0</span>
+            </div>
+        </div>
+
+        <!-- Tabel Data Stok -->
+        <div class="p-3 overflow-y-auto flex-1">
+            <div class="mb-2">
+                <input type="text" id="search-summary" placeholder="Cari dalam rangkuman..." oninput="filterRangkumanStok()" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-purple-500">
+            </div>
+            <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 border-b border-gray-200">
+                            <th class="p-2">No</th>
+                            <th class="p-2">Nama Produk</th>
+                            <th class="p-2">Kategori</th>
+                            <th class="p-2 text-right">Harga Jual</th>
+                            <th class="p-2 text-center">Stok</th>
+                            <th class="p-2 text-center">SO</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-summary-body">
+                        <!-- Data produk akan dirender secara dinamis melalui script di bawah -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+ <!-- Footer Modal (Diperbarui dengan Tombol Cetak) -->
+<div class="bg-gray-50 px-4 py-2.5 border-t border-gray-200 flex justify-between items-center">
+    <span class="text-[11px] text-gray-500">Data stok real-time.</span>
+
+    <div class="flex flex-wrap items-center justify-between gap-1.5 p-1">
+        <div>
+            <button onclick="konfirmasiHapusSemuaProduk()" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-[10px] sm:text-xs font-bold flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-triangle-exclamation"></i> 
+                <span class="hidden xs:inline">Hapus Semua</span><span class="inline xs:hidden">Hapus</span>
+            </button>
+        </div>
+        
+        <div class="flex items-center gap-1.5">
+            <button onclick="cetakRangkumanStok()" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px] sm:text-xs font-bold flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-print"></i> 
+                <span>Cetak</span>
+            </button>
+            <button onclick="tutupRangkumanStok()" class="bg-gray-700 hover:bg-gray-800 text-white px-2 py-1 rounded text-[10px] sm:text-xs font-bold cursor-pointer">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 1. URL Google Apps Script milik Anda
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzjKu495R1LLSZ1iVHK9lBKbuoQBWUAaTBk7P1Rgp1GGbLVYwNOaua_KbN7TQEYbVSH/exec"; 
+
+/**
+ * Fungsi untuk mengirim/menyinkronkan data produk ke Google Spreadsheet
+ */
+async function syncProductToSheet(product, action = "UPDATE") {
+  if (!GOOGLE_SHEET_URL || GOOGLE_SHEET_URL.includes("...")) return;
+
+  try {
+    await fetch(GOOGLE_SHEET_URL, {
+      method: "POST",
+      mode: "no-cors", // Menghindari kendala CORS dari Google Apps Script
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: action,
+        product: product
+      })
+    });
+    console.log(`[Google Sheets] Berhasil menyinkronkan data (${action}):`, product.name);
+  } catch (err) {
+    console.error("[Google Sheets] Gagal menyinkronkan data produk:", err);
+  }
+}
+
+// 2. Fungsi saat Tambah Produk Baru
+function simpanProdukBaru() {
+  const produkBaru = {
+    id: Date.now().toString(),
+    name: document.getElementById('input-nama-produk').value,
+    category: document.getElementById('input-kategori-produk').value,
+    cost: Number(document.getElementById('input-modal-produk').value),
+    price: Number(document.getElementById('input-harga-produk').value),
+    stock: Number(document.getElementById('input-stok-produk').value),
+    img: document.getElementById('input-gambar-produk').value || ""
+  };
+
+  // Simpan ke array/localStorage lokal kasir
+  products.push(produkBaru);
+  localStorage.setItem('pos_products', JSON.stringify(products));
+  renderProducts();
+
+  // Kirim backup data produk baru ke Google Spreadsheet
+  syncProductToSheet(produkBaru, "ADD");
+}
+
+// 3. Fungsi saat Edit / Update Produk
+function updateProduk(idProduk) {
+  const index = products.findIndex(p => p.id === idProduk);
+  
+  if (index !== -1) {
+    products[index].name = document.getElementById('edit-nama-produk').value;
+    products[index].category = document.getElementById('edit-kategori-produk').value;
+    products[index].cost = Number(document.getElementById('edit-modal-produk').value);
+    products[index].price = Number(document.getElementById('edit-harga-produk').value);
+    products[index].stock = Number(document.getElementById('edit-stok-produk').value);
+    products[index].img = document.getElementById('edit-gambar-produk').value;
+
+    // Update ke array/localStorage lokal kasir
+    localStorage.setItem('pos_products', JSON.stringify(products));
+    renderProducts();
+
+    // Kirim update data produk ke Google Spreadsheet
+    syncProductToSheet(products[index], "UPDATE");
+  }
+}
+</script>
 </body>
 </html>
